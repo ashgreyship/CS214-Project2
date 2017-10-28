@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/cc -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/Project_2.dir/main.c.o CMakeFiles/Project_2.dir/mergesort.c.o CMakeFiles/Project_2.dir/sorter.c.o CMakeFiles/Project_2.dir/test.c.o  -o Project_2 
