@@ -32,5 +32,4 @@ void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies,i
 
 void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow);
 
-
-
+void readDirectory(char *inputDir, int parentPID, int totalPro, int indent);

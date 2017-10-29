@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "Sorter.h"
+#include <limits.h>
 #include "mergesort.c"
 
 int main(int agrc, char *argv[]) {
@@ -18,7 +19,7 @@ int main(int agrc, char *argv[]) {
     }
 
     char *sortField = argv[2];
-    char *inputDir = NULL;
+    char *inputDir = malloc(sizeof(char) * 100);
     char *outputDir = NULL;
 
     if (agrc == 5 || agrc == 7) {
@@ -42,12 +43,15 @@ int main(int agrc, char *argv[]) {
         outputDir = ".";
     }
 
-
-    int totalPro=1;
+    int totalPro = 1;
     int parentPID = getpid();
     printf("Initial PID: %d\n", parentPID);
     printf("PIDS of all child processes: ");
-    readDirectory(inputDir, parentPID,totalPro);
+    fflush(stdout);
+    int indent;
+    readDirectory(inputDir, parentPID, totalPro, indent);
+
+
 //    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
 //    int row;
 //    for (row = 0; row < 100000; row++) {
@@ -286,50 +290,58 @@ void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies,
 
 //    On each new file in a directory you encounter, you should fork() a child process to do the actual sorting.
 //    On each new directory you encounter, you should fork() a child process to process the directory.
-void readDirectory(char *inputDir, int parentPID,int totalPro) {
-    DIR *dirp;
+void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
+    DIR *dir;
     struct dirent *dp;
-    if ((dirp = opendir(inputDir)) == NULL) {
-        printf("%s directory does not exist", inputDir);
+    if (!(dir = opendir(inputDir))) {
+        printf("%s directory does not exist\n", inputDir);
         return;
     }
-    struct stat sb;
-    do {
-        if ((dp = readdir(dirp)) != NULL) {
-            if (stat(dp->d_name, &sb) == 0 && S_ISDIR(sb.st_mode)) {       //it is directory
-                printf("directory name: %s\n", dp->d_name);
+
+    while ((dp = readdir(dir)) != NULL) {
+        if (dp->d_name[0] == '.') {
+            continue;
+        }
+        if (dp->d_type == DT_DIR) {
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
+          //  printf("%*s[%s]\n", indent, "", dp->d_name);
+          //  printf("directory name:%s", path);
+            pid_t pid = fork();
+            if (pid > 0) {    // it is parent
+                printf("%d,", pid);
+            } else if (pid == 0) {    //it is child
+                totalPro++;
+                readDirectory(path, parentPID, totalPro, indent + 2);
+                exit(totalPro);
+            }
+        } else {
+            char *fileExtension = strrchr(dp->d_name, '.');
+            if (strcmp(fileExtension + 1, "csv") == 0) {
+            //    printf("file name:%s\n", dp->d_name);
                 pid_t pid = fork();
                 if (pid > 0) {    // it is parent
-                    printf("%d", pid);
-                } else if (pid == 0) {    //it is child
+                    printf("%d,", pid);
+                    //keep searching
+                } else {
                     totalPro++;
-                    readDirectory(dp->d_name, parentPID,totalPro);
+                    //sort the csv file.
+                    exit(totalPro);
                     break;
                 }
-            } else {                                                        // it is file
-                printf("file name is:%s", dp->d_name);
-                char *fileExtension = strrchr(dp->d_name, '.');
-                if (strcmp(fileExtension + 1, "csv") == 0) {
-                    pid_t pid = fork();
-                    if (pid > 0) {    // it is parent
-                        printf("%d", pid);
-                    } else {
-                        totalPro++;
-                        break;
-                    }
-                }
-                closedir(dirp);
-                return;
             }
         }
-    } while (dp != NULL);
+
+    }
+    closedir(dir);
 
     printf("\n");
-    if(parentPID==getpid())
+    if (parentPID == getpid()) {
         wait(&totalPro);
-    printf("Total number of processes: %d",totalPro);
-
+        printf("Total number of processes: %d\n", totalPro / 255);
+    }
 }
+
 
 
 
