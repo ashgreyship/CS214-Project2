@@ -35,19 +35,19 @@ int main(int agrc, char *argv[]) {
             outputDir = argv[6];
         }
     }
-    if(inputDir==NULL){
-        inputDir=".";
+    if (inputDir == NULL) {
+        inputDir = ".";
     }
-    if(outputDir==NULL){
-        outputDir=".";
+    if (outputDir == NULL) {
+        outputDir = ".";
     }
 
 
-    int *pidArray = malloc(sizeof(int) * 300);
-    int pidNum = 0;
-
-    readDirectory(inputDir, pidArray, &pidNum);
-
+    int totalPro=1;
+    int parentPID = getpid();
+    printf("Initial PID: %d\n", parentPID);
+    printf("PIDS of all child processes: ");
+    readDirectory(inputDir, parentPID,totalPro);
 //    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
 //    int row;
 //    for (row = 0; row < 100000; row++) {
@@ -72,8 +72,7 @@ int main(int agrc, char *argv[]) {
 //    initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
 //    printSortedMovies(unsortMovies, preSortMovies, totalRow - 1);
 
-    waitAllProcesses(pidArray,&pidNum);
-    printPIDInfo(pidArray,&pidNum);
+
 //    freeStructArray(unsortMovies);
 //    free(preSortMovies);
 //    free(pidArray);
@@ -287,8 +286,7 @@ void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies,
 
 //    On each new file in a directory you encounter, you should fork() a child process to do the actual sorting.
 //    On each new directory you encounter, you should fork() a child process to process the directory.
-void readDirectory(char *inputDir, int *pidArray, int *pidNum) {
-    int currPID=0;
+void readDirectory(char *inputDir, int parentPID,int totalPro) {
     DIR *dirp;
     struct dirent *dp;
     if ((dirp = opendir(inputDir)) == NULL) {
@@ -299,24 +297,24 @@ void readDirectory(char *inputDir, int *pidArray, int *pidNum) {
     do {
         if ((dp = readdir(dirp)) != NULL) {
             if (stat(dp->d_name, &sb) == 0 && S_ISDIR(sb.st_mode)) {       //it is directory
-                printf("directory name: %s\n",dp->d_name);
+                printf("directory name: %s\n", dp->d_name);
                 pid_t pid = fork();
                 if (pid > 0) {    // it is parent
-                    pidArray[*pidNum] = pid;
-                    (*pidNum)++;
+                    printf("%d", pid);
                 } else if (pid == 0) {    //it is child
-                    readDirectory(dp->d_name, pidArray, pidNum);
+                    totalPro++;
+                    readDirectory(dp->d_name, parentPID,totalPro);
                     break;
                 }
             } else {                                                        // it is file
-                printf("file name is:%s",dp->d_name);
+                printf("file name is:%s", dp->d_name);
                 char *fileExtension = strrchr(dp->d_name, '.');
                 if (strcmp(fileExtension + 1, "csv") == 0) {
                     pid_t pid = fork();
                     if (pid > 0) {    // it is parent
-                        pidArray[*pidNum] = pid;
-                        (*pidNum)++;
-                    }else{
+                        printf("%d", pid);
+                    } else {
+                        totalPro++;
                         break;
                     }
                 }
@@ -325,25 +323,13 @@ void readDirectory(char *inputDir, int *pidArray, int *pidNum) {
             }
         }
     } while (dp != NULL);
-}
 
-void printPIDInfo(int *pidArray,int *pidNum){
-    printf("Initial PID: %d\n",pidArray[0]);
-    int i;
-    printf("PIDS of all child processes: ");
-    for(i=1;i<=*pidNum;i++){
-        printf("%d,",pidArray[i]);
-    }
     printf("\n");
-    printf("Total number of processes: %d",*pidNum+1);
+    if(parentPID==getpid())
+        wait(&totalPro);
+    printf("Total number of processes: %d",totalPro);
+
 }
 
-void waitAllProcesses(int *pidArray,int *pidNum){
-    int status;
-    int i;
-    for(i=1;i<=*pidNum;i++) {
-        waitpid(pidArray[i], &status, WUNTRACED);
-    }
-}
 
 
