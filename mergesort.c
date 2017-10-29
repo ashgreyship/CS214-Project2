@@ -1,8 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-//
-#include "Sorter.h"
+//#include "Sorter.h"
 
 
 void initializeMergeSort(unsortMovie **preSortMovies, int sortFieldToInt, int totalRow);
@@ -24,14 +23,6 @@ void mergeSort( unsortMovie **preSortMovies, int totalRow, int originalRows, int
     unsortMovie **leftArray = malloc(sizeof(struct unsortMovie * ) * middle);
     unsortMovie **rightArray = malloc(sizeof(struct unsortMovie * ) * (totalRow - middle));
 
-//    for (row = 0; row < middle; row++) {
-//        leftArray[row] = malloc(sizeof(unsortMovie) * 100000);
-//    }
-//    for (row = 0; row < (totalRow - middle); row++) {
-//        rightArray[row] = malloc(sizeof(unsortMovie) * 100000);
-//    }
-
-
     int i;
     for (i = 0; i < middle; i++) {
         leftArray[i] = preSortMovies[i];
@@ -45,13 +36,6 @@ void mergeSort( unsortMovie **preSortMovies, int totalRow, int originalRows, int
     mergeSort(rightArray, totalRow - middle, originalRows, sortFieldToInt);
     merge(preSortMovies, leftArray, middle, rightArray, totalRow - middle, sortFieldToInt);
 
-
-//    for (row = 0; row < middle; row++) {
-//        free(leftArray[row]);
-//    }
-//    for (row = 0; row < (totalRow-middle); row++) {
-//        free(rightArray[row]);
-//    }
     free(leftArray);
     free(rightArray);
 

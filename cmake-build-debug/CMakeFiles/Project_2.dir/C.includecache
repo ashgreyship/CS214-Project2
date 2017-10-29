@@ -19,6 +19,8 @@ stdlib.h
 -
 string.h
 -
+Sorter.h
+/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/Sorter.h
 
 /Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/sorter.c
 stdio.h
@@ -33,4 +35,12 @@ mergesort.c
 /Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/mergesort.c
 
 /Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/test.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
 

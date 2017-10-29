@@ -8,6 +8,8 @@ set(SOURCE_FILES
         mergesort.c
         sorter.c
         Sorter.h
-        test.c)
+        test.c
+        README.md
+        )
 
 add_executable(Project_2 ${SOURCE_FILES})

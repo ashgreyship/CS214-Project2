@@ -3,6 +3,7 @@
 
 CMakeFiles/Project_2.dir/main.c.o: ../main.c
 
+CMakeFiles/Project_2.dir/mergesort.c.o: ../Sorter.h
 CMakeFiles/Project_2.dir/mergesort.c.o: ../mergesort.c
 
 CMakeFiles/Project_2.dir/sorter.c.o: ../Sorter.h

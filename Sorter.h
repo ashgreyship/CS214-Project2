@@ -31,3 +31,9 @@ void freeStructArray(unsortMovie **unsortMovies);
 void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies,int totalRow);
 
 void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow);
+
+void readDirectory(char *inputDir, int *pidArray, int *pidNum);
+
+void printPIDInfo(int *pidArray,int *pidNum);
+
+void waitAllProcesses(int *pidArray,int *pidNum);

@@ -1,11 +1,14 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include "Sorter.h"
 #include "mergesort.c"
 
 int main(int agrc, char *argv[]) {
-    if (agrc < 3) {
+    if (agrc < 3 || agrc == 4 || agrc == 6 || agrc > 7) {
         printf("Format of arguments is incorrect\n");
         return 1;
     }
@@ -13,55 +16,67 @@ int main(int agrc, char *argv[]) {
         printf("first argument is incorrect\n");
         return 1;
     }
-    char *sortField = argv[2];
 
-    if (agrc == 4 || agrc == 6 || agrc > 7) {
-        printf("Format of arguments is incorrect\n");
-        return 1;
-    }
+    char *sortField = argv[2];
+    char *inputDir = NULL;
+    char *outputDir = NULL;
 
     if (agrc == 5 || agrc == 7) {
         if (strcmp(argv[3], "-d") == 0) {
-            char *inputDir = argv[3];
+            inputDir = argv[4];
         } else if (strcmp(argv[3], "-o") == 0) {
-            char *outputDir = argv[3];
+            outputDir = argv[4];
         }
     }
-
     if (agrc == 7) {
-        if (strcmp(argv[6], "-d") == 0) {
-            char *inputDir = argv[6];
-        } else if (strcmp(argv[6], "-o") == 0) {
-            char *outputDir = argv[6];
+        if (strcmp(argv[5], "-d") == 0) {
+            inputDir = argv[6];
+        } else if (strcmp(argv[5], "-o") == 0) {
+            outputDir = argv[6];
         }
     }
-
-    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
-    int row;
-    for (row = 0; row < 100000; row++) {
-        unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
+    if(inputDir==NULL){
+        inputDir=".";
+    }
+    if(outputDir==NULL){
+        outputDir=".";
     }
 
-    int totalRow;
-    storeRows(unsortMovies, &totalRow);
-    splitRows(unsortMovies, totalRow);
 
-    int sortFieldToInt;
-    if (checkFieldExistence(unsortMovies, sortField, &sortFieldToInt) == 1) {
-        printf("the field is not exist\n");
-        freeStructArray(unsortMovies);
-        return 1;
-    }
+    int *pidArray = malloc(sizeof(int) * 300);
+    int pidNum = 0;
 
-    unsortMovie **preSortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
+    readDirectory(inputDir, pidArray, &pidNum);
 
-    excludeFirstStruct(unsortMovies, preSortMovies, totalRow);
+//    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
+//    int row;
+//    for (row = 0; row < 100000; row++) {
+//        unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
+//    }
+//
+//    int totalRow;
+//    storeRows(unsortMovies, &totalRow);
+//    splitRows(unsortMovies, totalRow);
+//
+//    int sortFieldToInt;
+//    if (checkFieldExistence(unsortMovies, sortField, &sortFieldToInt) == 1) {
+//        printf("the field is not exist\n");
+//        freeStructArray(unsortMovies);
+//        return 1;
+//    }
+//
+//    unsortMovie **preSortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
+//
+//    excludeFirstStruct(unsortMovies, preSortMovies, totalRow);
+//
+//    initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
+//    printSortedMovies(unsortMovies, preSortMovies, totalRow - 1);
 
-    initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
-    printSortedMovies(unsortMovies, preSortMovies, totalRow - 1);
-    freeStructArray(unsortMovies);
-    free(preSortMovies);
-
+    waitAllProcesses(pidArray,&pidNum);
+    printPIDInfo(pidArray,&pidNum);
+//    freeStructArray(unsortMovies);
+//    free(preSortMovies);
+//    free(pidArray);
     return 0;
 }
 
@@ -268,9 +283,67 @@ void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies,
     for (i = 1; i < totalRow; i++) {
         preSortMovies[i - 1] = unsortMovies[i];
     }
-
-
 }
 
+//    On each new file in a directory you encounter, you should fork() a child process to do the actual sorting.
+//    On each new directory you encounter, you should fork() a child process to process the directory.
+void readDirectory(char *inputDir, int *pidArray, int *pidNum) {
+    int currPID=0;
+    DIR *dirp;
+    struct dirent *dp;
+    if ((dirp = opendir(inputDir)) == NULL) {
+        printf("%s directory does not exist", inputDir);
+        return;
+    }
+    struct stat sb;
+    do {
+        if ((dp = readdir(dirp)) != NULL) {
+            if (stat(dp->d_name, &sb) == 0 && S_ISDIR(sb.st_mode)) {       //it is directory
+                printf("directory name: %s\n",dp->d_name);
+                pid_t pid = fork();
+                if (pid > 0) {    // it is parent
+                    pidArray[*pidNum] = pid;
+                    (*pidNum)++;
+                } else if (pid == 0) {    //it is child
+                    readDirectory(dp->d_name, pidArray, pidNum);
+                    break;
+                }
+            } else {                                                        // it is file
+                printf("file name is:%s",dp->d_name);
+                char *fileExtension = strrchr(dp->d_name, '.');
+                if (strcmp(fileExtension + 1, "csv") == 0) {
+                    pid_t pid = fork();
+                    if (pid > 0) {    // it is parent
+                        pidArray[*pidNum] = pid;
+                        (*pidNum)++;
+                    }else{
+                        break;
+                    }
+                }
+                closedir(dirp);
+                return;
+            }
+        }
+    } while (dp != NULL);
+}
+
+void printPIDInfo(int *pidArray,int *pidNum){
+    printf("Initial PID: %d\n",pidArray[0]);
+    int i;
+    printf("PIDS of all child processes: ");
+    for(i=1;i<=*pidNum;i++){
+        printf("%d,",pidArray[i]);
+    }
+    printf("\n");
+    printf("Total number of processes: %d",*pidNum+1);
+}
+
+void waitAllProcesses(int *pidArray,int *pidNum){
+    int status;
+    int i;
+    for(i=1;i<=*pidNum;i++) {
+        waitpid(pidArray[i], &status, WUNTRACED);
+    }
+}
 
 

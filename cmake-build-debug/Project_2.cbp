@@ -82,6 +82,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/README.md">
+			<Option target="Project_2"/>
+		</Unit>
 		<Unit filename="/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/Sorter.h">
 			<Option target="Project_2"/>
 		</Unit>
