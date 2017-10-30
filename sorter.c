@@ -5,8 +5,11 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "Sorter.h"
+#include <sys/mman.h>
 #include <limits.h>
 #include "mergesort.c"
+
+static int *totalPro;
 
 int main(int agrc, char *argv[]) {
     if (agrc < 3 || agrc == 4 || agrc == 6 || agrc > 7) {
@@ -43,13 +46,21 @@ int main(int agrc, char *argv[]) {
         outputDir = ".";
     }
 
-    int totalPro = 1;
+    //int totalPro=1;
     int parentPID = getpid();
     printf("Initial PID: %d\n", parentPID);
     printf("PIDS of all child processes: ");
     fflush(stdout);
     int indent;
-    readDirectory(inputDir, parentPID, totalPro, indent);
+
+
+    totalPro = mmap(NULL, sizeof *totalPro, PROT_READ | PROT_WRITE,
+                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    *totalPro = 1;
+    readDirectory(inputDir, parentPID, indent);
+    printf("\ntotal process:%d\n",*totalPro);
+    munmap(totalPro, sizeof *totalPro);
+
 
 
 //    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
@@ -290,7 +301,7 @@ void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies,
 
 //    On each new file in a directory you encounter, you should fork() a child process to do the actual sorting.
 //    On each new directory you encounter, you should fork() a child process to process the directory.
-void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
+void readDirectory(char *inputDir, int parentPID, int indent) {
     DIR *dir;
     struct dirent *dp;
     if (!(dir = opendir(inputDir))) {
@@ -305,19 +316,19 @@ void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
             char path[1024];
             snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
             //  printf("%*s[%s]\n", indent, "", dp->d_name);
-            totalPro++;
+            (*totalPro)++;
             pid_t pid = fork();
             if (pid > 0) {    // it is parent
                 printf("%d,", pid);
                 fflush(stdout);
             } else if (pid == 0) {    //it is child
-                readDirectory(path, parentPID, totalPro, indent + 2);
-                exit(totalPro);
+                readDirectory(path, parentPID, indent + 2);
+                exit(EXIT_SUCCESS);
             }
         } else {
             char *fileExtension = strrchr(dp->d_name, '.');
             if (strcmp(fileExtension + 1, "csv") == 0) {
-                totalPro++;
+                (*totalPro)++;
                 pid_t pid = fork();
                 if (pid > 0) {    // it is parent
                     printf("%d,", pid);
@@ -325,7 +336,7 @@ void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
                     //keep searching
                 } else {
                     //sort the csv file.
-                    exit(totalPro);
+                    exit(EXIT_SUCCESS);
                 }
             }
         }
@@ -333,16 +344,10 @@ void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
     }
     closedir(dir);
     int pid;
-    while ((pid=waitpid(-1,&totalPro,0))!=-1) {
-        printf("Process %d terminated\n",pid);
+    while ((pid=wait(NULL))!=-1) {
+        //printf("Process %d terminated\n",pid);
     }
-    printf("\npid is %d", getpid());
-
-    printf("\nTotal number of processes: %d\n", totalPro / 255);
-
-
-
-
+   // printf("\npid is %d", getpid());
 
 }
 

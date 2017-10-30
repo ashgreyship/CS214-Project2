@@ -15,8 +15,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sorter" afterPath="$PROJECT_DIR$/sorter" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test" afterPath="$PROJECT_DIR$/test" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/Project_2.cbp" afterPath="$PROJECT_DIR$/cmake-build-debug/Project_2.cbp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Sorter.h" afterPath="$PROJECT_DIR$/Sorter.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sorter.c" afterPath="$PROJECT_DIR$/sorter.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.c" afterPath="$PROJECT_DIR$/test.c" />
     </list>
@@ -33,14 +32,14 @@
     <favorites_list name="Project_2" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.58615386">
+    <splitter split-orientation="horizontal" split-proportion="0.5366027">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="Sorter.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Sorter.h">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="578">
-                  <caret line="34" column="19" lean-forward="false" selection-start-line="34" selection-start-column="19" selection-end-line="34" selection-end-column="19" />
+                  <caret line="34" column="48" lean-forward="false" selection-start-line="34" selection-start-column="48" selection-end-line="34" selection-end-column="48" />
                   <folding />
                 </state>
               </provider>
@@ -49,8 +48,8 @@
           <file leaf-file-name="sorter.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sorter.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="242">
-                  <caret line="310" column="33" lean-forward="false" selection-start-line="310" selection-start-column="30" selection-end-line="310" selection-end-column="33" />
+                <state relative-caret-position="529">
+                  <caret line="60" column="14" lean-forward="false" selection-start-line="60" selection-start-column="14" selection-end-line="60" selection-end-column="14" />
                   <folding>
                     <element signature="e#0#17#0" expanded="true" />
                   </folding>
@@ -77,8 +76,8 @@
           <file leaf-file-name="test.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/test.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="306">
-                  <caret line="18" column="33" lean-forward="false" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
+                <state relative-caret-position="323">
+                  <caret line="28" column="30" lean-forward="true" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
                   <folding>
                     <element signature="e#0#17#0" expanded="true" />
                   </folding>
@@ -108,6 +107,8 @@
       <find>checkFieldExistence</find>
       <find>indent</find>
       <find>total number of</find>
+      <find>totalPro</find>
+      <find>total process</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -118,9 +119,9 @@
       <list>
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/mergesort.c" />
-        <option value="$PROJECT_DIR$/Sorter.h" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/test.c" />
+        <option value="$PROJECT_DIR$/Sorter.h" />
         <option value="$PROJECT_DIR$/sorter.c" />
       </list>
     </option>
@@ -131,10 +132,10 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="128" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="231" />
     <option name="y" value="23" />
-    <option name="width" value="1552" />
+    <option name="width" value="1449" />
     <option name="height" value="1027" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -238,7 +239,7 @@
       <workItem from="1509212743012" duration="122000" />
       <workItem from="1509212949853" duration="3842000" />
       <workItem from="1509222132509" duration="18758000" />
-      <workItem from="1509302265131" duration="15165000" />
+      <workItem from="1509302265131" duration="18685000" />
     </task>
     <task id="LOCAL-00001" summary="Readm">
       <created>1509222520266</created>
@@ -275,11 +276,18 @@
       <option name="project" value="LOCAL" />
       <updated>1509313042970</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Readm">
+      <created>1509323043261</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1509323043261</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="38216000" />
+    <option name="totallyTimeSpent" value="41736000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -291,7 +299,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="23" width="1679" height="1027" extended-state="6" />
+    <frame x="231" y="23" width="1449" height="1027" extended-state="0" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32939914" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Debug Logs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32939914" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -301,7 +309,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32939914" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32939914" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.102490425" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.10201588" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24969475" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32967034" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -355,7 +363,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="4" />
+      <option name="time" value="6" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -551,6 +559,24 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/mer.c" />
+    <entry file="file://$PROJECT_DIR$/mergesort.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="3" column="2" lean-forward="false" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="17" lean-forward="false" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider editor-type-id="text-editor">
         <state relative-caret-position="2057">
@@ -571,33 +597,15 @@
     <entry file="file://$PROJECT_DIR$/Sorter.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="578">
-          <caret line="34" column="19" lean-forward="false" selection-start-line="34" selection-start-column="19" selection-end-line="34" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mergesort.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="3" column="2" lean-forward="false" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="17" lean-forward="false" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+          <caret line="34" column="48" lean-forward="false" selection-start-line="34" selection-start-column="48" selection-end-line="34" selection-end-column="48" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="33" lean-forward="false" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
+        <state relative-caret-position="323">
+          <caret line="28" column="30" lean-forward="true" selection-start-line="28" selection-start-column="30" selection-end-line="28" selection-end-column="30" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
@@ -606,8 +614,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sorter.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="310" column="33" lean-forward="false" selection-start-line="310" selection-start-column="30" selection-end-line="310" selection-end-column="33" />
+        <state relative-caret-position="529">
+          <caret line="60" column="14" lean-forward="false" selection-start-line="60" selection-start-column="14" selection-end-line="60" selection-end-column="14" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
