@@ -103,6 +103,9 @@
 		<Unit filename="/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/test.c">
 			<Option target="Project_2"/>
 		</Unit>
+		<Unit filename="/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/testDir">
+			<Option target="Project_2"/>
+		</Unit>
 		<Unit filename="/Users/gabriel/Onedrive/Education/RU/5th semester/Systems Programming/Project 2/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

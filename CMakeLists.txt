@@ -10,6 +10,7 @@ set(SOURCE_FILES
         Sorter.h
         test.c
         README.md
+        testDir
         )
 
 add_executable(Project_2 ${SOURCE_FILES})

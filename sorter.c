@@ -297,7 +297,6 @@ void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
         printf("%s directory does not exist\n", inputDir);
         return;
     }
-
     while ((dp = readdir(dir)) != NULL) {
         if (dp->d_name[0] == '.') {
             continue;
@@ -305,41 +304,46 @@ void readDirectory(char *inputDir, int parentPID, int totalPro, int indent) {
         if (dp->d_type == DT_DIR) {
             char path[1024];
             snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
-          //  printf("%*s[%s]\n", indent, "", dp->d_name);
-          //  printf("directory name:%s", path);
+            //  printf("%*s[%s]\n", indent, "", dp->d_name);
+            totalPro++;
             pid_t pid = fork();
             if (pid > 0) {    // it is parent
                 printf("%d,", pid);
+                fflush(stdout);
             } else if (pid == 0) {    //it is child
-                totalPro++;
                 readDirectory(path, parentPID, totalPro, indent + 2);
                 exit(totalPro);
             }
         } else {
             char *fileExtension = strrchr(dp->d_name, '.');
             if (strcmp(fileExtension + 1, "csv") == 0) {
-            //    printf("file name:%s\n", dp->d_name);
+                totalPro++;
                 pid_t pid = fork();
                 if (pid > 0) {    // it is parent
                     printf("%d,", pid);
+                    fflush(stdout);
                     //keep searching
                 } else {
-                    totalPro++;
                     //sort the csv file.
                     exit(totalPro);
-                    break;
                 }
             }
         }
 
     }
     closedir(dir);
-
-    printf("\n");
-    if (parentPID == getpid()) {
-        wait(&totalPro);
-        printf("Total number of processes: %d\n", totalPro / 255);
+    int pid;
+    while ((pid=waitpid(-1,&totalPro,0))!=-1) {
+        printf("Process %d terminated\n",pid);
     }
+    printf("\npid is %d", getpid());
+
+    printf("\nTotal number of processes: %d\n", totalPro / 255);
+
+
+
+
+
 }
 
 

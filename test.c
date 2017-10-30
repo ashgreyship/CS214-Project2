@@ -8,6 +8,7 @@
 
 int main() {
     printf("Hello\n");
+    int parentPID=getpid();
     int status;
     int totalProcess=1;
     pid_t pid = fork();
@@ -20,10 +21,14 @@ int main() {
 
     } else {
         printf("This is a parent process.\n");
+
+    }
+
+
+    if(parentPID==getpid()){
         wait(&totalProcess);
         printf("pid:%d",totalProcess/255);
     }
-
     return totalProcess;
 }
 
