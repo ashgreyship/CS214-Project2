@@ -4,7 +4,7 @@ typedef struct movie {
 } unsortMovie;
 
 
-int storeRows(unsortMovie **unsortMovies, int *totalRow);
+int storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow);
 
 int splitRows(unsortMovie **unsortMovies, int totalRow);
 
@@ -28,8 +28,18 @@ void delCarriageReturn(char *str);
 
 void freeStructArray(unsortMovie **unsortMovies);
 
-void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies,int totalRow);
+void
+printSortedMovies(char *fileWithoutExtension, char *sortField, unsortMovie **unsortMovies, unsortMovie **preSortMovies,
+                  int totalRow, char *outputDir);
 
 void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow);
 
-void readDirectory(char *inputDir, int parentPID, int indent);
+void readDirectory(char *inputDir, char *outputDir, int indent, char *sortField);
+
+int multiSort(char *CSVPath, char *sortField, char *outputDir);
+
+void removefileNameExtension(char *fileName, char *fileWithoutExtension);
+
+void formatOutputNameinDir(char *new_str, char *filenameWithoutExtension, char *field, char *directoryName);
+
+void formatOutputNameinCurrDir(char *new_str, char *filenameWithoutExtension, char *field);

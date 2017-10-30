@@ -22,7 +22,7 @@ int main(int agrc, char *argv[]) {
     }
 
     char *sortField = argv[2];
-    char *inputDir = malloc(sizeof(char) * 100);
+    char *inputDir ;
     char *outputDir = NULL;
 
     if (agrc == 5 || agrc == 7) {
@@ -30,6 +30,8 @@ int main(int agrc, char *argv[]) {
             inputDir = argv[4];
         } else if (strcmp(argv[3], "-o") == 0) {
             outputDir = argv[4];
+        } else {
+            printf("second argument is incorrect\n");
         }
     }
     if (agrc == 7) {
@@ -37,6 +39,8 @@ int main(int agrc, char *argv[]) {
             inputDir = argv[6];
         } else if (strcmp(argv[5], "-o") == 0) {
             outputDir = argv[6];
+        } else {
+            printf("third argument is incorrect\n");
         }
     }
     if (inputDir == NULL) {
@@ -45,32 +49,88 @@ int main(int agrc, char *argv[]) {
     if (outputDir == NULL) {
         outputDir = ".";
     }
+    printf("inputDir:%s\n",inputDir);
 
-    //int totalPro=1;
     int parentPID = getpid();
     printf("Initial PID: %d\n", parentPID);
     printf("PIDS of all child processes: ");
     fflush(stdout);
     int indent;
 
-
     totalPro = mmap(NULL, sizeof *totalPro, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *totalPro = 1;
-    readDirectory(inputDir, parentPID, indent);
-    printf("\ntotal process:%d\n",*totalPro);
+    readDirectory(inputDir, outputDir, indent, sortField);
+    printf("\ntotal process:%d\n", *totalPro);
     munmap(totalPro, sizeof *totalPro);
+    return 0;
+}
 
+void readDirectory(char *inputDir, char *outputDir, int indent, char *sortField) {
+    DIR *dir;
+    struct dirent *dp;
+    if (!(dir = opendir(inputDir))) {
+        printf("%s directory does not exist\n", inputDir);
+        return;
+    }
+    while ((dp = readdir(dir)) != NULL) {
+        if (dp->d_name[0] == '.') {
+            continue;
+        }
+        printf("name:%s\n",dp->d_name);
+        if (dp->d_type == DT_DIR) {
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
+            //  printf("%*s[%s]\n", indent, "", dp->d_name);
+            (*totalPro)++;
+            pid_t pid = fork();
+            if (pid > 0) {    // it is parent
+                printf("%d,", pid);
+                fflush(stdout);
+            } else if (pid == 0) {    //it is child
+                readDirectory(path, outputDir, indent + 2, sortField);
+                exit(EXIT_SUCCESS);
+            }
+        } else {
+            char *fileExtension = strrchr(dp->d_name, '.');
+            if(fileExtension==NULL){
+                continue;
+            }
+            if (strcmp(fileExtension + 1, "csv") == 0) {
+                (*totalPro)++;
+                pid_t pid = fork();
+                if (pid > 0) {    // it is parent
+                    printf("%d,", pid);
+                    fflush(stdout);
+                    //keep searching
+                } else {
+                    multiSort(dp->d_name, sortField, outputDir);
+                    //sort the csv file.
+                    exit(EXIT_SUCCESS);
+                }
+            }
+        }
+    }
+    closedir(dir);
+    int pid;
+    while ((pid = wait(NULL)) != -1) {
+        //printf("Process %d terminated\n",pid);
+    }
+    // printf("\npid is %d", getpid());
+}
 
+int multiSort(char *CSVPath, char *sortField, char *outputDir) {
+    char *fileWithoutExtension = malloc(10);
+    removefileNameExtension(CSVPath, fileWithoutExtension);
 
-//    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
-//    int row;
-//    for (row = 0; row < 100000; row++) {
-//        unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
-//    }
-//
-//    int totalRow;
-//    storeRows(unsortMovies, &totalRow);
+    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
+    int row;
+    for (row = 0; row < 100000; row++) {
+        unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
+    }
+
+    int totalRow;
+    storeRows(CSVPath, unsortMovies, &totalRow);
 //    splitRows(unsortMovies, totalRow);
 //
 //    int sortFieldToInt;
@@ -85,25 +145,93 @@ int main(int agrc, char *argv[]) {
 //    excludeFirstStruct(unsortMovies, preSortMovies, totalRow);
 //
 //    initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
-//    printSortedMovies(unsortMovies, preSortMovies, totalRow - 1);
-
-
+//    printSortedMovies(fileWithoutExtension, sortField, unsortMovies, preSortMovies, totalRow - 1, outputDir);
+//
+//    free(fileWithoutExtension);
 //    freeStructArray(unsortMovies);
 //    free(preSortMovies);
-//    free(pidArray);
+
     return 0;
 }
 
-int storeRows(unsortMovie **unsortMovies, int *totalRow) {
+void
+printSortedMovies(char *fileWithoutExtension, char *sortField, unsortMovie **unsortMovies, unsortMovie **preSortMovies,
+                  int totalRow, char *outputDir) {
+
+    if (strcmp(outputDir, ".") == 0) {
+        FILE *fptr;
+        char *outputFileName = malloc(100);
+        formatOutputNameinCurrDir(outputFileName, fileWithoutExtension, sortField);
+        fptr = fopen(outputFileName, "w");
+        int i;
+        fprintf(fptr, "%s", unsortMovies[0]->aRowString);
+        for (i = 0; i < totalRow; i++) {
+            fprintf(fptr, "%s", preSortMovies[i]->aRowString);
+        }
+        fclose(fptr);
+        free(outputFileName);
+    } else {
+        FILE *fptr;
+        struct stat st = {0};
+        if (stat(outputDir, &st) == -1) {
+            mkdir(outputDir, 0700);
+        } else {
+            printf("failed to create a folder");
+        }
+        char *outputFileName = malloc(100);
+        formatOutputNameinDir(outputFileName, fileWithoutExtension, sortField, outputDir);
+        fptr = fopen(outputFileName, "w");
+        int i;
+        fprintf(fptr, "%s", unsortMovies[0]->aRowString);
+        for (i = 0; i < totalRow; i++) {
+            fprintf(fptr, "%s", preSortMovies[i]->aRowString);
+        }
+        fclose(fptr);
+        free(outputFileName);
+    }
+}
+
+void removefileNameExtension(char *fileName, char *fileWithoutExtension) {
+    int num = strstr(fileName, ".") - fileName;
+    strncpy(fileWithoutExtension, fileName, num);
+}
+
+void formatOutputNameinDir(char *new_str, char *filenameWithoutExtension, char *field, char *directoryName) {
+    new_str[0] = '\0';
+    strcat(new_str, directoryName);
+    strcat(new_str, "\\");
+    strcat(new_str, filenameWithoutExtension);
+    strcat(new_str, "-sorted-");
+    strcat(new_str, field);
+    strcat(new_str, ".csv");
+}
+
+void formatOutputNameinCurrDir(char *new_str, char *filenameWithoutExtension, char *field) {
+    new_str[0] = '\0';
+    strcat(new_str, filenameWithoutExtension);
+    strcat(new_str, "-sorted-");
+    strcat(new_str, field);
+    strcat(new_str, ".csv");
+}
+
+int storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow) {
+    FILE *fp;
+    fp = fopen(CSVPath, "r");
+    if (fp == NULL) {
+        perror("Error opening file");
+        return (-1);
+    }
+
     *totalRow = 0;
     char *currRow = malloc(sizeof(char) * 50000);
-    while (fgets(currRow, 50000, stdin)) {
+    while (fgets(currRow, 50000, fp)) {
         currRow[strcspn(currRow, "\n")] = 0;
         unsortMovies[*totalRow]->aRowString = malloc(sizeof(char) * 5000);
         strcpy(unsortMovies[*totalRow]->aRowString, currRow);
         (*totalRow)++;
     }
     free(currRow);
+    fclose(fp);
     return 0;
 }
 
@@ -284,71 +412,12 @@ void freeStructArray(unsortMovie **unsortMovies) {
     free(unsortMovies);
 }
 
-void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow) {
-    int i;
-    printf("%s", unsortMovies[0]->aRowString);
-    for (i = 0; i < totalRow; i++) {
-        printf("%s", preSortMovies[i]->aRowString);
-    }
-}
 
 void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow) {
     int i;
     for (i = 1; i < totalRow; i++) {
         preSortMovies[i - 1] = unsortMovies[i];
     }
-}
-
-//    On each new file in a directory you encounter, you should fork() a child process to do the actual sorting.
-//    On each new directory you encounter, you should fork() a child process to process the directory.
-void readDirectory(char *inputDir, int parentPID, int indent) {
-    DIR *dir;
-    struct dirent *dp;
-    if (!(dir = opendir(inputDir))) {
-        printf("%s directory does not exist\n", inputDir);
-        return;
-    }
-    while ((dp = readdir(dir)) != NULL) {
-        if (dp->d_name[0] == '.') {
-            continue;
-        }
-        if (dp->d_type == DT_DIR) {
-            char path[1024];
-            snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
-            //  printf("%*s[%s]\n", indent, "", dp->d_name);
-            (*totalPro)++;
-            pid_t pid = fork();
-            if (pid > 0) {    // it is parent
-                printf("%d,", pid);
-                fflush(stdout);
-            } else if (pid == 0) {    //it is child
-                readDirectory(path, parentPID, indent + 2);
-                exit(EXIT_SUCCESS);
-            }
-        } else {
-            char *fileExtension = strrchr(dp->d_name, '.');
-            if (strcmp(fileExtension + 1, "csv") == 0) {
-                (*totalPro)++;
-                pid_t pid = fork();
-                if (pid > 0) {    // it is parent
-                    printf("%d,", pid);
-                    fflush(stdout);
-                    //keep searching
-                } else {
-                    //sort the csv file.
-                    exit(EXIT_SUCCESS);
-                }
-            }
-        }
-
-    }
-    closedir(dir);
-    int pid;
-    while ((pid=wait(NULL))!=-1) {
-        //printf("Process %d terminated\n",pid);
-    }
-   // printf("\npid is %d", getpid());
-
 }
 
 

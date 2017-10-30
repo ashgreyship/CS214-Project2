@@ -6,6 +6,8 @@
 #include<sys/types.h>
 #include <dirent.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+
 //
 //int main() {
 //    printf("Hello\n");
@@ -35,23 +37,34 @@
 
 
 
-
-static int *glob_var;
-
-int main(void)
+void main()
 {
-    glob_var = mmap(NULL, sizeof *glob_var, PROT_READ | PROT_WRITE,
-                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    FILE *fptr;
+    char name[20]="davaf";
+    int age=12;
+    float salary=12.32;
 
-    *glob_var = 1;
+    /*  open for writing */
+    struct stat st = {0};
 
-    if (fork() == 0) {
-        *glob_var = 5;
-        exit(EXIT_SUCCESS);
-    } else {
-        wait(NULL);
-        printf("%d\n", *glob_var);
-        munmap(glob_var, sizeof *glob_var);
+    if (stat("testFolder", &st) == -1) {
+        mkdir("testFolder", 0700);
+    }else{
+        printf("failed to create a folder");
     }
-    return 0;
+
+
+    fptr = fopen("testFolder/emp.csv", "w");
+
+
+
+    fprintf(fptr, "Name  = %s\n", name);
+
+
+    fprintf(fptr, "Age  = %d\n", age);
+
+
+    fprintf(fptr, "Salary  = %.2f\n", salary);
+
+    fclose(fptr);
 }
