@@ -90,13 +90,14 @@ int main(int agrc, char *argv[]) {
     totalPro = mmap(NULL, sizeof *totalPro, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *totalPro = 1;
-    readDirectory(SrcPath, inputDir, outputDir, indent, sortField);
+    readDirectory( inputDir, outputDir, indent, sortField);
     printf("\ntotal process:%d\n", *totalPro);
     munmap(totalPro, sizeof *totalPro);
     return 0;
 }
 
-void readDirectory(char *SrcPath, char *inputDir, char *outputDir, int indent, char *sortField) {
+
+void readDirectory(char *inputDir, char *outputDir, int indent, char *sortField) {
     DIR *dir;
     struct dirent *dp;
     if (!(dir = opendir(inputDir))) {
@@ -110,14 +111,13 @@ void readDirectory(char *SrcPath, char *inputDir, char *outputDir, int indent, c
         if (dp->d_type == DT_DIR) {
             char path[1024];
             snprintf(path, sizeof(path), "%s/%s", inputDir, dp->d_name);
-            //printf("%*s[%s]\n", indent, "", dp->d_name);
             (*totalPro)++;
             pid_t pid = fork();
             if (pid > 0) {    // it is parent
                 printf("%d,", pid);
                 fflush(stdout);
             } else if (pid == 0) {    //it is child
-                readDirectory(SrcPath, path, outputDir, indent + 2, sortField);
+                readDirectory(path, outputDir, indent + 2, sortField);
                 exit(EXIT_SUCCESS);
             }
         } else {
@@ -134,7 +134,7 @@ void readDirectory(char *SrcPath, char *inputDir, char *outputDir, int indent, c
                     printf("%d,", pid);
                     fflush(stdout);
                 } else {
-                    multiSort(SrcPath, dp->d_name, path, sortField, outputDir);
+                    multiSort(dp->d_name, path, sortField, outputDir);
                     exit(EXIT_SUCCESS);
                 }
             }
@@ -145,10 +145,9 @@ void readDirectory(char *SrcPath, char *inputDir, char *outputDir, int indent, c
     while ((pid = wait(NULL)) != -1) {
         //printf("Process %d terminated\n",pid);
     }
-    // printf("\npid is %d", getpid());
 }
 
-int multiSort(char *SrcPath, char *CSVName, char *CSVPath, char *sortField, char *outputDir) {
+int multiSort(char *CSVName, char *CSVPath, char *sortField, char *outputDir) {
     unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
     int row;
     for (row = 0; row < 100000; row++) {
@@ -159,9 +158,10 @@ int multiSort(char *SrcPath, char *CSVName, char *CSVPath, char *sortField, char
     storeRows(CSVPath, unsortMovies, &totalRow);
     splitRows(unsortMovies, totalRow);
 
+
     int sortFieldToInt;
     if (checkFieldExistence(unsortMovies, sortField, &sortFieldToInt) == 1) {
-        printf("the field does not exist\n");
+        printf("\nthe field does not exist\n");
         freeStructArray(unsortMovies);
         _exit(0);
     }
@@ -170,7 +170,7 @@ int multiSort(char *SrcPath, char *CSVName, char *CSVPath, char *sortField, char
     excludeFirstStruct(unsortMovies, preSortMovies, totalRow);
     initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
 
-    printSortedMovies(SrcPath, CSVName, CSVPath, sortField, unsortMovies, preSortMovies,
+    printSortedMovies(CSVName, CSVPath, sortField, unsortMovies, preSortMovies,
                       totalRow - 1, outputDir);
 
     freeStructArray(unsortMovies);
@@ -179,83 +179,65 @@ int multiSort(char *SrcPath, char *CSVName, char *CSVPath, char *sortField, char
 }
 
 void
-printSortedMovies(char *SrcPath, char *CSVName, char *CSVPath, char *sortField,
+printSortedMovies(char *CSVName, char *CSVPath, char *sortField,
                   unsortMovie **unsortMovies,
                   unsortMovie **preSortMovies,
                   int totalRow, char *outputDir) {
 
-    char *outputFileName = malloc(500);
-
+    char *outputFileName = malloc(sizeof(char)*10000);
+    FILE *fptr;
     if (strcmp(outputDir, "srcDir") == 0) {
-        FILE *fptr;
         formatOutputNameinSrcDir(outputFileName, sortField, CSVName);
         fptr = fopen(outputFileName, "w");
-        int i;
-        fprintf(fptr, "%s", unsortMovies[0]->aRowString);
-        for (i = 0; i < totalRow; i++) {
-            fprintf(fptr, "%s", preSortMovies[i]->aRowString);
-        }
-        fclose(fptr);
     } else if (strcmp(outputDir, "currDir") == 0) {
-        FILE *fptr;
         formatOutputNameinCurrDir(outputFileName, sortField, CSVPath);
         fptr = fopen(outputFileName, "w");
-        int i;
-        fprintf(fptr, "%s", unsortMovies[0]->aRowString);
-        for (i = 0; i < totalRow; i++) {
-            fprintf(fptr, "%s", preSortMovies[i]->aRowString);
-        }
-        fclose(fptr);
     } else {
-        FILE *fptr;
         struct stat st = {0};
         if (stat(outputDir, &st) == -1) {
             mkdir(outputDir, 0700);
         }
-//        else {
-//            printf("failed to create a folder,%s\n", outputDir);
-//            _exit(0);
-//        }
         formatOutputNameinDir(outputFileName, sortField, outputDir, CSVName);
         fptr = fopen(outputFileName, "w");
-        int i;
-        fprintf(fptr, "%s", unsortMovies[0]->aRowString);
-        for (i = 0; i < totalRow; i++) {
-            fprintf(fptr, "%s", preSortMovies[i]->aRowString);
-        }
-        fclose(fptr);
     }
+    int i;
+    fprintf(fptr, "%s\n", unsortMovies[0]->aRowString);
+    for (i = 0; i < totalRow; i++) {
+        fprintf(fptr, "%s\n", preSortMovies[i]->aRowString);
+    }
+    fclose(fptr);
     free(outputFileName);
 
 }
 
 void formatOutputNameinSrcDir(char *outputFileName, char *sortField, char *CSVName) {
     // new_str[0] = '\0';
-    char *CSVNameWithoutExtension = malloc(sizeof(char) * 300);
+    outputFileName[0]='\0';
+    char *CSVNameWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVName, CSVNameWithoutExtension);
     strcat(outputFileName, CSVNameWithoutExtension);
     strcat(outputFileName, "-sorted-");
     strcat(outputFileName, sortField);
     strcat(outputFileName, ".csv");
-    printf("\nformatOutputNameinSrcDir is %s\n", outputFileName);
+    //printf("\nformatOutputNameinSrcDir is %s\n", outputFileName);
     free(CSVNameWithoutExtension);
 }
 
 void formatOutputNameinCurrDir(char *outputFileName, char *sortField, char *CSVPath) {
     // new_str[0] = '\0';
-    char *CSVPathWithoutExtension = malloc(sizeof(char) * 300);
+    char *CSVPathWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVPath, CSVPathWithoutExtension);
     strcat(outputFileName, CSVPathWithoutExtension);
     strcat(outputFileName, "-sorted-");
     strcat(outputFileName, sortField);
     strcat(outputFileName, ".csv");
-    printf("\nformatOutputNameinCurrDir is %s\n", outputFileName);
+    //printf("\nformatOutputNameinCurrDir is %s\n", outputFileName);
     free(CSVPathWithoutExtension);
 }
 
 void formatOutputNameinDir(char *outputFileName, char *sortField, char *outputDir, char *CSVName) {
     //new_str[0] = '\0';
-    char *CSVNameWithoutExtension = malloc(sizeof(char) * 300);
+    char *CSVNameWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVName, CSVNameWithoutExtension);
     strcat(outputFileName, outputDir);
     strcat(outputFileName, "/");
@@ -263,37 +245,35 @@ void formatOutputNameinDir(char *outputFileName, char *sortField, char *outputDi
     strcat(outputFileName, "-sorted-");
     strcat(outputFileName, sortField);
     strcat(outputFileName, ".csv");
-    printf("\nformatOutputNameinSrcDir is %s\n", outputFileName);
+    //printf("\nformatOutputNameinSrcDir is %s\n", outputFileName);
     free(CSVNameWithoutExtension);
 }
 
 void removefileNameExtension(char *fileName, char *fileWithoutExtension) {
     int num = strstr(fileName, ".") - fileName;
     strncpy(fileWithoutExtension, fileName, num);
-//    char* result=strrchr(fileWithoutExtension,'/');
-//    strcpy(fileWithoutExtension,result+1);
 }
 
-int storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow) {
+void storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow) {
     FILE *fp;
     fp = fopen(CSVPath, "r");
     if (fp == NULL) {
         printf("\nfilepath is %s", CSVPath);
         perror("Error opening file");
-        return (-1);
+        _exit(0);
     }
 
     *totalRow = 0;
     char *currRow = malloc(sizeof(char) * 50000);
     while (fgets(currRow, 50000, fp)) {
         currRow[strcspn(currRow, "\n")] = 0;
+
         unsortMovies[*totalRow]->aRowString = malloc(sizeof(char) * 5000);
         strcpy(unsortMovies[*totalRow]->aRowString, currRow);
         (*totalRow)++;
     }
     free(currRow);
     fclose(fp);
-    return 0;
 }
 
 int splitRows(unsortMovie **unsortMovies, int totalRow) {
@@ -467,9 +447,6 @@ void delCarriageReturn(char *str) {
 
 void freeStructArray(unsortMovie **unsortMovies) {
     int row;
-    int i;
-
-
     for (row = 0; row < 100000; row++) {
         free(unsortMovies[row]->aRowfieldsArray);
         free(unsortMovies[row]->aRowString);

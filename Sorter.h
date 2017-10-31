@@ -3,12 +3,12 @@ typedef struct movie {
     char *aRowString;
 } unsortMovie;
 
-void readDirectory(char *SrcPath, char *inputDir, char *outputDir, int indent, char *sortField);
+void readDirectory(char *inputDir, char *outputDir, int indent, char *sortField);
 
-int multiSort(char *SrcPath, char *CSVName, char *CSVPath, char *sortField, char *outputDir);
+int multiSort(char *CSVName, char *CSVPath, char *sortField, char *outputDir);
 
 void
-printSortedMovies(char *SrcPath, char *CSVName, char *CSVPath, char *sortField,
+printSortedMovies(char *CSVName, char *CSVPath, char *sortField,
                   unsortMovie **unsortMovies,
                   unsortMovie **preSortMovies,
                   int totalRow, char *outputDir);
@@ -21,7 +21,7 @@ void formatOutputNameinDir(char *outputFileName, char *sortField, char *outputDi
 
 void removefileNameExtension(char *fileName, char *fileWithoutExtension);
 
-int storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow);
+void storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow);
 
 int splitRows(unsortMovie **unsortMovies, int totalRow);
 
