@@ -37,7 +37,7 @@ void mergeSort(unsortMovie **preSortMovies, int totalRow, int originalRows, int 
     mergeSort(leftArray, middle, originalRows, sortFieldToInt);
     mergeSort(rightArray, totalRow - middle, originalRows, sortFieldToInt);
     merge(preSortMovies, leftArray, middle, rightArray, totalRow - middle, sortFieldToInt);
-
+    // printf("success");
     free(leftArray);
     free(rightArray);
 
@@ -54,11 +54,21 @@ void merge(unsortMovie **preSortMovies, unsortMovie **leftUnsortMovies, int left
         sortFieldToInt == 11 || sortFieldToInt == 12 || sortFieldToInt == 15 || sortFieldToInt == 17 ||
         sortFieldToInt == 18 || sortFieldToInt == 20 || sortFieldToInt == 21 || sortFieldToInt == 22) {
         while (leftIndex < leftCount && rightIndex < rightCount) {
+
             int leftLength = strlen(leftUnsortMovies[leftIndex]->aRowfieldsArray[sortFieldToInt - 1]);
             int rightLength = strlen(rightUnsortMovies[rightIndex]->aRowfieldsArray[sortFieldToInt - 1]);
+//            printf("left is %s\n", leftUnsortMovies[leftIndex]->aRowfieldsArray[sortFieldToInt - 1]);
+//            printf("right is %s\n", rightUnsortMovies[rightIndex]->aRowfieldsArray[sortFieldToInt - 1]);
+
+            if (strcmp(leftUnsortMovies[leftIndex]->aRowfieldsArray[sortFieldToInt - 1],
+                       rightUnsortMovies[rightIndex]->aRowfieldsArray[sortFieldToInt - 1]) == 0) {
+                preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
+                continue;
+            }
+
             int strLength = leftLength;
             if (leftLength > rightLength)
-                strLength = rightIndex;
+                strLength = rightLength;
             int j = 0;
             for (j = 0; j < strLength; j++) {
                 char leftChar = leftUnsortMovies[leftIndex]->aRowfieldsArray[sortFieldToInt - 1][j];
@@ -73,41 +83,55 @@ void merge(unsortMovie **preSortMovies, unsortMovie **leftUnsortMovies, int left
                     if (leftCharToInt < rightCharToInt) {
                         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
                         break;
-                    } else if(leftCharToInt > rightCharToInt) {
+                    } else if (leftCharToInt > rightCharToInt) {
                         preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
                         break;
-                    }else{
+                    } else {
+                        if (j + 1 == strLength) {
+                            if (leftLength < rightLength) {
+                                preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
+                            }else{
+                                preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
+                            }
+                        }
                         continue;
                     }
                 } else if (leftIsUpper == 0 && rightIsUpper == 0) {   //both Lower
                     if (leftCharToInt < rightCharToInt) {
                         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
                         break;
-                    } else if(leftCharToInt > rightCharToInt){
+                    } else if (leftCharToInt > rightCharToInt) {
                         preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
                         break;
-                    }else{
+                    } else {
+                        if (j + 1 == strLength) {
+                            if (leftLength < rightLength) {
+                                preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
+                            }else{
+                                preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
+                            }
+                        }
                         continue;
                     }
                 } else if (leftIsUpper != 0 && rightIsUpper == 0) {   // left Upper, right Lower
                     if (leftCharToInt + 32 == rightCharToInt) {
                         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
                         break;
-                    }else if(leftCharToInt + 32 < rightCharToInt){
+                    } else if (leftCharToInt + 32 < rightCharToInt) {
                         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
                         break;
-                    }else {
+                    } else {
                         preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
                         break;
                     }
-                }else if(leftIsUpper == 0 && rightIsUpper != 0){    // left Lower, right Upper
-                    if(rightCharToInt+32 == leftCharToInt){
-
-                        break;
-                    }else if(rightCharToInt+32 < leftCharToInt){
+                } else if (leftIsUpper == 0 && rightIsUpper != 0) {    // left Lower, right Upper
+                    if (rightCharToInt + 32 == leftCharToInt) {
                         preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
                         break;
-                    }else{
+                    } else if (rightCharToInt + 32 < leftCharToInt) {
+                        preSortMovies[mergedIndex++] = rightUnsortMovies[rightIndex++];
+                        break;
+                    } else {
                         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
                         break;
                     }

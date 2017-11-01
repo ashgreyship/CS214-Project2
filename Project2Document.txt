@@ -1,0 +1,39 @@
+CS 214 System programming Project 2
+My program can be used to sort multiple CSV files with multiprocess.
+The test case i used is imdb-5000-movie-dataset and dataset4.csv(which is test file for first project).
+My program has a while loop. It will fork a new process if it finds a CSV file or a folder.
+If it is a folder, it will then recursively check every file in that folder
+If it is a csv file, it will check if it has the right format and if the field from the command line does exist in the CSV file.
+Then it will sort the file and output in the place where you specify. 
+
+For every folder or CSV file, my program will output the pid of the new process. 
+
+It will output the number of total process including all child process and the greatest parent process. 
+
+The following steps are the algorithm for every CSV file to be sorted:
+I create a struct array. Every struct includes one row and a string array. The string array
+store the value of fields after I format the fields. Since some fields are blank, include blank space
+at the beginning or include double quotation mark. I store the string value of the fields after I remove these marks.
+Then I transfer the input field type into an integer and compare with every field in the first row. 
+If it exists, I compare the specific field-type in each struct and change the order. The output will be the string of the structs after sorting the dataset. 
+
+My header file Sorter.h has all the headers of the functions in sorter.c.
+
+
+
+Usage:
+gcc sorter.c -o sorter
+./sorter -c field_type -d inputFilePath -o outputFilePath
+
+-c filed_type is required, If  the field_type does not exist, it will output the error message.
+
+-d inputFilePath is optional, if it is not specified, the default is to check all the files in the folder of source code.
+	if inputFilePath is specified, then the program will check all the files in that path.
+
+-o outputFilePath is optional. if -o outputFilePath is not specified, it will output all the sorted files in the folder of source code.
+							   if -o outputFilePath  is specified, then the program will output all the sorted files in that path.
+							   if only use -o without specifying the outputFilePath, it will output all the sorted files in the same directory of input files
+
+
+
+

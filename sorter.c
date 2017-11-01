@@ -77,9 +77,9 @@ int main(int agrc, char *argv[]) {
         }
     }
 
-    char SrcPath[1024];
-    getcwd(SrcPath, sizeof(SrcPath));
-    printf("Source source path is %s\n", SrcPath);
+//    char SrcPath[1024];
+//    getcwd(SrcPath, sizeof(SrcPath));
+//    printf("Source source path is %s\n", SrcPath);
 
     int parentPID = getpid();
     printf("Initial PID: %d\n", parentPID);
@@ -90,7 +90,7 @@ int main(int agrc, char *argv[]) {
     totalPro = mmap(NULL, sizeof *totalPro, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     *totalPro = 1;
-    readDirectory( inputDir, outputDir, indent, sortField);
+    readDirectory(inputDir, outputDir, indent, sortField);
     printf("\ntotal process:%d\n", *totalPro);
     munmap(totalPro, sizeof *totalPro);
     return 0;
@@ -184,7 +184,7 @@ printSortedMovies(char *CSVName, char *CSVPath, char *sortField,
                   unsortMovie **preSortMovies,
                   int totalRow, char *outputDir) {
 
-    char *outputFileName = malloc(sizeof(char)*10000);
+    char *outputFileName = malloc(sizeof(char) * 10000);
     FILE *fptr;
     if (strcmp(outputDir, "srcDir") == 0) {
         formatOutputNameinSrcDir(outputFileName, sortField, CSVName);
@@ -211,11 +211,10 @@ printSortedMovies(char *CSVName, char *CSVPath, char *sortField,
 }
 
 void formatOutputNameinSrcDir(char *outputFileName, char *sortField, char *CSVName) {
-    // new_str[0] = '\0';
-    outputFileName[0]='\0';
+    outputFileName[0] = '\0';
     char *CSVNameWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVName, CSVNameWithoutExtension);
-    strcat(outputFileName, CSVNameWithoutExtension);
+    strcpy(outputFileName, CSVNameWithoutExtension);
     strcat(outputFileName, "-sorted-");
     strcat(outputFileName, sortField);
     strcat(outputFileName, ".csv");
@@ -224,10 +223,10 @@ void formatOutputNameinSrcDir(char *outputFileName, char *sortField, char *CSVNa
 }
 
 void formatOutputNameinCurrDir(char *outputFileName, char *sortField, char *CSVPath) {
-    // new_str[0] = '\0';
+    outputFileName[0] = '\0';
     char *CSVPathWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVPath, CSVPathWithoutExtension);
-    strcat(outputFileName, CSVPathWithoutExtension);
+    strcpy(outputFileName, CSVPathWithoutExtension);
     strcat(outputFileName, "-sorted-");
     strcat(outputFileName, sortField);
     strcat(outputFileName, ".csv");
@@ -236,10 +235,10 @@ void formatOutputNameinCurrDir(char *outputFileName, char *sortField, char *CSVP
 }
 
 void formatOutputNameinDir(char *outputFileName, char *sortField, char *outputDir, char *CSVName) {
-    //new_str[0] = '\0';
+    outputFileName[0] = '\0';
     char *CSVNameWithoutExtension = malloc(sizeof(char) * 100000);
     removefileNameExtension(CSVName, CSVNameWithoutExtension);
-    strcat(outputFileName, outputDir);
+    strcpy(outputFileName, outputDir);
     strcat(outputFileName, "/");
     strcat(outputFileName, CSVNameWithoutExtension);
     strcat(outputFileName, "-sorted-");
@@ -249,10 +248,24 @@ void formatOutputNameinDir(char *outputFileName, char *sortField, char *outputDi
     free(CSVNameWithoutExtension);
 }
 
-void removefileNameExtension(char *fileName, char *fileWithoutExtension) {
-    int num = strstr(fileName, ".") - fileName;
-    strncpy(fileWithoutExtension, fileName, num);
+//void removefileNameExtension(char *fileName, char *fileWithoutExtension) {
+//    int num = strstr(fileName, ".") - fileName;
+//    strncpy(fileWithoutExtension, fileName, num);
+//}
+
+void removefileNameExtension(char *fileName, char *CSVNameWithoutExtension) {
+    char *retstr;
+    char *lastdot;
+    if ((retstr = malloc(strlen(fileName) + 1)) == NULL)
+        exit(0);
+    strcpy (retstr, fileName);
+    lastdot = strrchr(retstr, '.');
+    if (lastdot != NULL)
+        *lastdot = '\0';
+    strcpy(CSVNameWithoutExtension, retstr);
+    free(retstr);
 }
+
 
 void storeRows(char *CSVPath, unsortMovie **unsortMovies, int *totalRow) {
     FILE *fp;
